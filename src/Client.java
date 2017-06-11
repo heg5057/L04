@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
@@ -14,8 +15,22 @@ public class Client {
     
     public static void main(String[] args) throws Exception {
         Client http = new Client();
+        File diary = new File("src/diary.txt");
+        
         http.sendGet("https://www.apple.com");
-        http.sendPost("https://www.apple.com");
+        http.sendPost("https://www.apple.com", diary);
+        
+        FileReader reader = new FileReader(diary);
+        BufferedReader buffReader = new BufferedReader(reader);
+        String temp = null;
+        while(buffReader.ready()){
+            temp = buffReader.readLine();
+        }
+        buffReader.close();
+        reader.close();
+        
+        http.sendGet("https://www.apple.com"+temp);
+        
     }
     
     private void sendGet(String query) throws Exception {
@@ -49,7 +64,7 @@ public class Client {
         }
         return "";
     }
-    private void sendPost(String query) throws Exception{
+    private void sendPost(String query, File diary) throws Exception{
         String userInput;
         System.out.println("Post Request");
         URL url = new URL(query);
@@ -57,7 +72,7 @@ public class Client {
         connection.setRequestMethod("POST");
         connection.setRequestProperty("User-Agent", "Mozilla/5.0");
         
-        FileWriter fw = new FileWriter("diary.txt", true);
+        FileWriter fw = new FileWriter(diary, true);
         BufferedWriter buffWriter = new BufferedWriter(fw);
         Scanner scnr = new Scanner(System.in);
             
@@ -77,11 +92,12 @@ public class Client {
         int responseCode = connection.getResponseCode();
         System.out.println("Response Code: " + responseCode);
         if (responseCode == 200) {
-            String response = getResponse(connection);
-            System.out.println("Response: " + response);
+            //String response = getResponse(connection);
+            //System.out.println("Response: " + response);
         } else {
-            System.out.println("Bad Response Code: " + responseCode);
+            //System.out.println("Bad Response Code: " + responseCode);
         }
+        
         
         
         
